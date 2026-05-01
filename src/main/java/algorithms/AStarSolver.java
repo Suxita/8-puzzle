@@ -14,17 +14,17 @@ public class AStarSolver {
             return new SolverResult("A*", root.getPath(), 1, 0);
         }
 
-        PriorityQueue<PuzzleState> open = new PriorityQueue<>(
+        PriorityQueue<PuzzleState> openList   = new PriorityQueue<>(  // discovered, ordered by f = g + h
             Comparator.comparingInt(PuzzleState::getF)
         );
-        Map<String, Integer> bestF = new HashMap<>();
+        Map<String, Integer> closedList = new HashMap<>();             // best f-score seen per state
 
-        open.add(root);
-        bestF.put(root.toKey(), root.getF());
+        openList.add(root);
+        closedList.put(root.toKey(), root.getF());
         int explored = 0;
 
-        while (!open.isEmpty()) {
-            PuzzleState cur = open.poll();
+        while (!openList.isEmpty()) {
+            PuzzleState cur = openList.poll();   // take best state from OPEN LIST
             explored++;
 
             if (cur.isGoal()) {
@@ -33,14 +33,14 @@ public class AStarSolver {
             }
 
             String curKey = cur.toKey();
-            if (bestF.containsKey(curKey) && bestF.get(curKey) < cur.getF()) continue;
+            if (closedList.containsKey(curKey) && closedList.get(curKey) < cur.getF()) continue;
 
             for (PuzzleState neighbor : cur.getNeighbors()) {
                 String key = neighbor.toKey();
                 int f = neighbor.getF();
-                if (!bestF.containsKey(key) || bestF.get(key) > f) {
-                    bestF.put(key, f);
-                    open.add(neighbor);
+                if (!closedList.containsKey(key) || closedList.get(key) > f) {
+                    closedList.put(key, f);   // update CLOSED LIST with best f
+                    openList.add(neighbor);   // → add to OPEN LIST
                 }
             }
         }

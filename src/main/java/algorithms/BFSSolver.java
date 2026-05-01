@@ -14,25 +14,26 @@ public class BFSSolver {
             return new SolverResult("BFS", root.getPath(), 1, 0);
         }
 
-        Queue<PuzzleState> queue = new LinkedList<>();
-        Set<String> visited = new HashSet<>();
-        queue.add(root);
-        visited.add(root.toKey());
+        Queue<PuzzleState> openList   = new LinkedList<>();  // discovered, not yet processed
+        Set<String>        closedList = new HashSet<>();      // already processed
+
+        openList.add(root);
+        closedList.add(root.toKey());
         int explored = 0;
 
-        while (!queue.isEmpty()) {
-            PuzzleState cur = queue.poll();
+        while (!openList.isEmpty()) {
+            PuzzleState cur = openList.poll();   // take from front of OPEN LIST
             explored++;
 
             for (PuzzleState neighbor : cur.getNeighbors()) {
                 String key = neighbor.toKey();
-                if (!visited.contains(key)) {
-                    visited.add(key);
+                if (!closedList.contains(key)) {   // NOT in CLOSED LIST?
+                    closedList.add(key);            // → add to CLOSED LIST
                     if (neighbor.isGoal()) {
                         long elapsed = System.currentTimeMillis() - start;
                         return new SolverResult("BFS", neighbor.getPath(), explored, elapsed);
                     }
-                    queue.add(neighbor);
+                    openList.add(neighbor);         // → add to OPEN LIST
                 }
             }
         }
